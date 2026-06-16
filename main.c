@@ -13,7 +13,10 @@ char str[10][128];
 void loadStr(){
 	FILE* strfile=fopen("str/zh","r");
 	int i=0;
-	while(fgets(str[i],512,strfile)) i++;
+	while(fgets(str[i],128,strfile)){
+		str[i][strlen(str[i])-1]='\0';	//去除換行符
+		i++;
+	}
 }
 
 //指令在平台上存在?
@@ -25,7 +28,7 @@ bool cmdExist(char* s){
 		return !system(ss);
 	#else
 		snprintf(ss,128,"command -v %s > /dev/null 2>&1",s);
-		int ret=system(ss)
+		int ret=system(ss);
 		return (ret != -1 && WIFEXITED(ret) && WEXITSTATUS(ret) == 0);
 	#endif
 }
@@ -49,7 +52,23 @@ int main(){
 	}
 
 	int i;
+
+	//指令列表
 	for(i=0;i<5;i++){
-		printf(str[i+2]);
+		printf("%s\n",str[i+2]);
 	}
+
+	//接收輸入
+	char *cmd=NULL;
+	printf("\n%s",str[7]);
+	int index=getchar()-'0';
+	switch(index){
+		case 1:
+			cmd="arduino-cli board list";
+			break;
+		default:
+			printf(str[8]);
+			break;
+	}
+	system(cmd);
 }
