@@ -1,5 +1,6 @@
 #include<stdio.h>
 #include<stdlib.h>
+#include<string.h>
 #include<stdbool.h>
 #include<unistd.h>
 
@@ -38,6 +39,7 @@ int main(){
 
 	//接收輸入
 	char *cmd=NULL;
+	bool need_free=false;
 	printf("\n%s",str[7]);
 	int index=getchar()-'0';
 
@@ -50,24 +52,34 @@ int main(){
 			cmd="arduino-cli compile --fqbn arduino:avr:uno";
 			break;
 		case 3:
-
+			cmd="arduino-cli upload --fqbn arduino:avr:uno";
 			break;
 		case 4:
-
+			cmd="arduino-cli cache clean";
 			break;
 		case 5:{
 			int com;
 			printf(str[9]);
 			scanf("%d",&com);
 			cmd=(char*)malloc(64*sizeof(char));
+			if(cmd==NULL){
+				printf("記憶體分配失敗\n");
+				return 1;
+			}
+			need_free=true;
 		 	sprintf(cmd,"arduino-cli compile --fqbn arduino:avr:uno -p COM%d -u",com);
 			break;
 		}
 		default:
 			printf(str[8]);
-			break;
+			return 1;
 	}
-	system(cmd);
+	if(cmd!=NULL){
+		system(cmd);
+	}
+	if(need_free){
+		free(cmd);
+	}
 }
 
 void loadStr(){
