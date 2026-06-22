@@ -77,7 +77,7 @@ int main(){
 				if(!isValidComPort(com)){
 					if(lang=='z'){
 						printf("COM埠號碼無效 (1-256)\n");
-					} else {
+					}else {
 						printf("Invalid COM port (1-256)\n");
 					}
 					continue;
@@ -100,7 +100,7 @@ int main(){
 				loadStr();
 				if(lang=='z'){
 					printf("語言已切換為中文\n");
-				} else {
+				}else {
 					printf("Language switched to English\n");
 				}
 				continue;
