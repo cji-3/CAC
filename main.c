@@ -12,7 +12,7 @@
 	#include<sys/wait.h>
 #endif
 
-char str[10][128];	//字串
+char str[12][128];	//字串
 
 void loadStr();	//載入str
 bool cmdExist(char* s);	//指令在平台上存在?
@@ -33,6 +33,7 @@ int main(){
 	int i;
 
 	//打印指令列表
+	printf("%s\n",str[10]);
 	for(i=0;i<5;i++) printf("%s\n",str[i+2]);
 
 	//接收輸入
