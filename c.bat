@@ -1,1 +1,1 @@
-gcc main.c -o CAC.exe
+gcc main.c -Wall -std=c99 -O0 -o CAC.exe
