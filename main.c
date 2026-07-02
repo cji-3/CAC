@@ -25,7 +25,7 @@ bool isValidComPort(int port);	//驗證COM埠號碼
 int main(){
 	setCmdUTF8();
 	char* cwd=getcwd(NULL,0);
-	showLangMenu();
+	// showLangMenu();
 	loadStr();
 	chdir(cwd);
 
@@ -44,7 +44,8 @@ int main(){
 		for(i=0;i<5;i++) printf("%s\n",str[i+2]);
 		if(lang=='z'){
 			printf("6.切換語言 (EN)\n");
-		} else {
+		}
+		else{
 			printf("6. Switch Language (中文)\n");
 		}
 
