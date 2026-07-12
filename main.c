@@ -1,5 +1,6 @@
 #include<stdio.h>
 #include<stdlib.h>
+#include<stdint.h>
 #include<math.h>
 #include<stdbool.h>
 #include<windows.h>
@@ -25,6 +26,46 @@ int strToInt(const char *s){
 	return sig?out:-1*out;
 }
 
+bool __systemEnd=false;
+DWORD WINAPI __system(LPVOID cmd){
+	char *_cmd=(char*)malloc(512*sizeof(char));
+	sprintf(_cmd,"%s > %%TMP%%\\r.ctx 2>&1",(char*)cmd);
+	system(_cmd);
+	__systemEnd=true;
+	return 0;
+}
+
+void _system(char* cmd){
+	CreateThread(NULL,0,__system,cmd,0,NULL);
+	while(true){
+		int i;
+		for(i=0;i<3;i++){
+			putchar('.');
+			uint64_t t=GetTickCount()+300;
+			while(t>GetTickCount()){
+				if(__systemEnd) goto end;
+				Sleep(0);
+			}
+		}
+		printf("\b\b\b   \b\b\b");
+	}
+	end:
+	__systemEnd=false;
+	printf("\b\b\b   \b\b\b");
+
+	char *tmp=getenv("TMP");
+	char *path=(char*)malloc(1024*sizeof(char));
+	sprintf(path,"%s\\r.ctx",tmp);
+	FILE *f=fopen(path,"r");
+
+	char *s=(char*)malloc(1024*sizeof(char));
+	while(fgets(s,1024,f)){
+		printf("%s",s);
+	}
+	free(s);
+	fclose(f);
+}
+
 int main(int van,char* vas[]){
 	//set cmd for utf8
 	system("chcp 65001 > nul 2>&1");
@@ -48,7 +89,6 @@ int main(int van,char* vas[]){
 
 		int index;
 		scanf("%d",&index);
-		printf("\n");
 
 		char* cmd;
 		switch(index){
@@ -71,7 +111,7 @@ int main(int van,char* vas[]){
 				printf("目前沒有其他指令可用 :(");
 				break;
 		}
-		system(cmd);
+		_system(cmd);
 
 		exit(0);
 	}
@@ -110,7 +150,7 @@ int main(int van,char* vas[]){
 				printf("目前沒有其他指令可用 :(");
 				break;
 		}
-		system(cmd);
+		_system(cmd);
 
 		exit(0);
 	}
