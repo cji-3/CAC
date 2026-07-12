@@ -26,15 +26,31 @@ int strToInt(const char *s){
 	return sig?out:-1*out;
 }
 
-bool __systemEnd=false;
+bool __systemEnd=false;	//用於與_system()溝通，讓_system()知道__system()結束了沒
+/*
+待會要被_system()創建的線程函式
+接收要執行的命令字串，執行命令後將結果寫入%TMP%\r.ctx
+以__systemEnd變數與_system()溝通
+*/
 DWORD WINAPI __system(LPVOID cmd){
 	char *_cmd=(char*)malloc(512*sizeof(char));
 	sprintf(_cmd,"%s > %%TMP%%\\r.ctx 2>&1",(char*)cmd);
 	system(_cmd);
+	free(_cmd);
 	__systemEnd=true;
 	return 0;
 }
 
+/*
+會以"..."來表示命令正在執行的特殊system()函式
+接收一個命令字串
+原理：
+創建一個線程來執行命令(__system())
+以__systemEnd變數與__system()溝通
+以"..."來表示命令正在執行直到命令執行完畢
+__system()會將命令執行結果放到%TMP%\r.ctx
+打開該文件並打印(不讓__system()直接打印的原因是因為要先把"..."刪乾淨)
+*/
 void _system(char* cmd){
 	CreateThread(NULL,0,__system,cmd,0,NULL);
 	while(true){
@@ -48,22 +64,28 @@ void _system(char* cmd){
 			}
 		}
 		printf("\b\b\b   \b\b\b");
+		Sleep(300);
 	}
+
 	end:
-	__systemEnd=false;
-	printf("\b\b\b   \b\b\b");
+		__systemEnd=false;
+		printf("\b\b\b   \b\b\b");
 
-	char *tmp=getenv("TMP");
-	char *path=(char*)malloc(1024*sizeof(char));
-	sprintf(path,"%s\\r.ctx",tmp);
-	FILE *f=fopen(path,"r");
+		char *tmp=getenv("TMP");	//取得環境變數
+		char *path=(char*)malloc(1024*sizeof(char));
+		sprintf(path,"%s\\r.ctx",tmp);
+		FILE *f=fopen(path,"r");
 
-	char *s=(char*)malloc(1024*sizeof(char));
-	while(fgets(s,1024,f)){
-		printf("%s",s);
-	}
-	free(s);
-	fclose(f);
+		char *s=(char*)malloc(1024*sizeof(char));
+		while(fgets(s,1024,f)){
+			printf("%s",s);
+		}
+
+		free(s);
+		fclose(f);
+		remove(path);	//刪除文件
+		free(path);
+		free(tmp);
 }
 
 int main(int van,char* vas[]){
