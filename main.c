@@ -12,7 +12,7 @@ bool cmdExist(const char* s){
 	return !system(ss);
 }
 
-//將子串轉成一int整數
+//將字串轉成一int整數
 int strToInt(const char *s){
 	int i,len=strlen(s),out=0;
 	bool sig=true;	//正整數?
