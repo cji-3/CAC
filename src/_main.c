@@ -1,3 +1,9 @@
+/**
+ * @file _main.c
+ * @brief 選單模式 V1.*.*
+ * @date 2026-07-22
+ */
+
 #include<stdio.h>
 #include<stdlib.h>
 #include<stdint.h>
@@ -101,18 +107,26 @@ int main(int van,char* vas[]){
 	if(van==1) goto noInput;
 	else goto yesInput;
 
+	bool is3=false;
+
 	//指令沒有傳參
 	noInput:{
 		printf("0.列出COM口\t");
 		printf("1.編譯(驗證)\t");
 		printf("2.編譯並上傳\t");
-		printf("3.其他指令\t");
+		if(!is3) printf("3.其他指令\t");
+		else{
+			printf("\n5.串口監視器\t");
+			printf("6.初始化arduind-cli\t");
+			is3=false;
+		}
 		printf("\n歡迎使用CAC，依據指令列表輸入指令索引 >> ");
 
 		int index;
 		scanf("%d",&index);
 
-		char* cmd;
+		bool isCmd=true;
+		char* cmd=NULL;
 		switch(index){
 			case 0:
 				cmd="arduino-cli board list";
@@ -129,13 +143,32 @@ int main(int van,char* vas[]){
 		 			snprintf(cmd,64,"arduino-cli compile --fqbn arduino:avr:uno -p COM%d -u",com);
 				}
 				break;
+			case 3:
+				is3=true;
+				goto noInput;
+				break;
+			case 5:{
+				int com;
+				printf("輸入要監視的COM埠 >> ");
+				scanf("%d",&com);
+				cmd=(char*)malloc(128*sizeof(char));
+				sprintf(cmd,"arduino-cli monitor -p COM%d -c baudrate=%d",com,9600);
+				system(cmd);
+				isCmd=false;
+				break;
+			}
+			case 6:
+				system("file\\.bat");
+				isCmd=false;
+				break;
 			default:
 				printf("目前沒有其他指令可用 :(");
+				isCmd=false;
 				break;
 		}
-		_system(cmd);
+		if(isCmd) _system(cmd);
 
-		exit(0);
+		goto end;
 	}
 
 	//指令有傳參
@@ -144,7 +177,8 @@ int main(int van,char* vas[]){
 		int i;
 		for(i=0;i<van-1;i++) index[i]=strToInt(vas[i+1]);
 
-		char* cmd;
+		bool isCmd=true;
+		char* cmd=NULL;
 		switch(index[0]){
 			case 0:
 				cmd="arduino-cli board list";
@@ -168,14 +202,42 @@ int main(int van,char* vas[]){
 					}
 				}
 				break;
+			case 3:
+				printf("0.列出COM口\t");
+				printf("1.編譯(驗證)\t");
+				printf("2.編譯並上傳\t");
+				printf("3.其他指令\t");
+				printf("\n5.串口監視器\t");
+				printf("6.初始化arduind-cli\t");
+				isCmd=false;
+				break;
+			case 5:{
+				int com;
+				if(van<3){
+					printf("輸入要監視的COM埠 >> ");
+					scanf("%d",&com);
+				}
+				else com=strToInt(vas[2]);
+				cmd=(char*)malloc(128*sizeof(char));
+				sprintf(cmd,"arduino-cli monitor -p COM%d -c baudrate=%d",com,9600);
+				system(cmd);
+				isCmd=false;
+				break;
+			}
+			case 6:
+				system("file\\.bat");
+				isCmd=false;
+				break;
 			default:
 				printf("目前沒有其他指令可用 :(");
+				isCmd=false;
 				break;
 		}
-		_system(cmd);
+		if(isCmd) _system(cmd);
 
-		exit(0);
+		goto end;
 	}
 
-	return 0;
+	end:
+		return 0;
 }

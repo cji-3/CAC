@@ -1,0 +1,1 @@
+gcc src/_main.c -o bin/_CAC.exe -Wall -std=c99 -O0
