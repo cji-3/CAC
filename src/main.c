@@ -46,6 +46,7 @@ __system()會將命令執行結果放到%TMP%\r.ctx
 */
 void _system(char* cmd){
 	CreateThread(NULL,0,__system,cmd,0,NULL);
+	Sleep(100);
 	while(true){
 		int i;
 		for(i=0;i<3;i++){
@@ -107,7 +108,7 @@ void cdRunPath(){
 
 void displayHelp(){
 	cdExePath();
-	FILE *f=fopen("file/.help","r");
+	FILE *f=fopen("../file/.help","r");
 
 	if(!f) perror("說明檔遺失");
 
